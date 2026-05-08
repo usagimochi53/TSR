@@ -8,6 +8,7 @@ export type WalkTheme =
 
 export type Candidate = {
   id: string;
+  theme: WalkTheme;
   title: string;
   description: string;
   recommendedDistance: WalkDistance;

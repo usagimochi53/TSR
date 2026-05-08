@@ -135,8 +135,8 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-paper">
-      <div className="mx-auto flex max-w-6xl flex-col gap-7">
+    <main className="min-h-screen bg-emerald-50">
+      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-7 pb-10">
         <Header />
         <SearchForm
           startLocation={startLocation}
@@ -155,7 +155,7 @@ export default function Home() {
         />
         <CandidateList candidates={candidates} />
         <WalkSummary summary={walkSummary} />
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <div className="grid gap-7">
           <WalkRecordForm onAddRecord={handleAddRecord} />
           <WalkRecordList
             records={records}

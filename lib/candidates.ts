@@ -408,6 +408,7 @@ export function generateCandidates(
 
     return {
       id: `${theme}-${distance}-${index}`,
+      theme,
       title,
       description: `${themeDescriptions[theme][index]}${waypointText}`,
       recommendedDistance: distance,
