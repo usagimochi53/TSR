@@ -6,8 +6,10 @@ import { Header } from "@/components/Header";
 import { SearchForm } from "@/components/SearchForm";
 import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
+import { WalkSummary } from "@/components/WalkSummary";
 import { generateCandidates } from "@/lib/candidates";
 import { loadWalkRecords, saveWalkRecords } from "@/lib/storage";
+import { summarizeWalkRecords } from "@/lib/summary";
 import type {
   Candidate,
   CurrentLocation,
@@ -28,6 +30,7 @@ export default function Home() {
   const [locationError, setLocationError] = useState("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [records, setRecords] = useState<WalkRecord[]>([]);
+  const walkSummary = summarizeWalkRecords(records);
 
   useEffect(() => {
     setRecords(loadWalkRecords());
@@ -151,6 +154,7 @@ export default function Home() {
           onSubmit={handleSearch}
         />
         <CandidateList candidates={candidates} />
+        <WalkSummary summary={walkSummary} />
         <div className="grid gap-7 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <WalkRecordForm onAddRecord={handleAddRecord} />
           <WalkRecordList

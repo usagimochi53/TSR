@@ -31,3 +31,18 @@ export type WalkRecord = {
   memo: string;
   createdAt: string;
 };
+
+export type ThemeSummary = {
+  theme: WalkTheme;
+  count: number;
+  totalDistance: number;
+};
+
+export type WalkSummaryData = {
+  totalDistance: number;
+  currentMonthDistance: number;
+  currentMonthCount: number;
+  totalCount: number;
+  averageDistance: number;
+  themeSummaries: ThemeSummary[];
+};
