@@ -381,8 +381,10 @@ export function generateCandidates(
   distance: WalkDistance,
   theme: WalkTheme,
   returnToStart = false,
+  routeOrigin = startLocation,
 ): Candidate[] {
   const trimmedLocation = startLocation.trim();
+  const trimmedRouteOrigin = routeOrigin.trim();
   const routePlans = getRoutePlans(trimmedLocation, distance);
 
   return routePlans.map((routePlan, index) => {
@@ -393,6 +395,9 @@ export function generateCandidates(
       routePlan,
       returnToStart,
     );
+    const routeDestination = returnToStart
+      ? trimmedRouteOrigin
+      : routeStops.destination;
     const waypointText =
       routeStops.waypoints.length > 0
         ? `（経由：${routeStops.waypoints.join(" → ")}）`
@@ -415,8 +420,8 @@ export function generateCandidates(
       routeWaypoints: routeStops.waypoints,
       mapUrl: createGoogleMapsSearchUrl(searchKeyword),
       walkingRouteUrl: createGoogleMapsWalkingRouteUrl(
-        trimmedLocation,
-        routeStops.destination,
+        trimmedRouteOrigin,
+        routeDestination,
         routeStops.waypoints,
       ),
     };

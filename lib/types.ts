@@ -18,6 +18,11 @@ export type Candidate = {
   walkingRouteUrl: string;
 };
 
+export type CurrentLocation = {
+  latitude: number;
+  longitude: number;
+};
+
 export type WalkRecord = {
   id: string;
   date: string;

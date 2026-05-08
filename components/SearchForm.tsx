@@ -7,12 +7,15 @@ type SearchFormProps = {
   startLocation: string;
   distance: WalkDistance;
   returnToStart: boolean;
+  isGettingLocation: boolean;
   theme: WalkTheme;
   error: string;
+  locationError: string;
   onStartLocationChange: (value: string) => void;
   onDistanceChange: (value: WalkDistance) => void;
   onReturnToStartChange: (value: boolean) => void;
   onThemeChange: (value: WalkTheme) => void;
+  onUseCurrentLocation: () => void;
   onSubmit: () => void;
 };
 
@@ -28,12 +31,15 @@ export function SearchForm({
   startLocation,
   distance,
   returnToStart,
+  isGettingLocation,
   theme,
   error,
+  locationError,
   onStartLocationChange,
   onDistanceChange,
   onReturnToStartChange,
   onThemeChange,
+  onUseCurrentLocation,
   onSubmit,
 }: SearchFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -54,14 +60,30 @@ export function SearchForm({
           >
             出発地
           </label>
-          <input
-            id="start-location"
-            value={startLocation}
-            onChange={(event) => onStartLocationChange(event.target.value)}
-            placeholder="例：渋谷駅、自宅の最寄り駅"
-            className="w-full rounded-md border border-stone-300 bg-white px-3 py-3 text-base outline-none transition focus:border-moss focus:ring-2 focus:ring-leaf/30"
-          />
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <input
+              id="start-location"
+              value={startLocation}
+              onChange={(event) => onStartLocationChange(event.target.value)}
+              placeholder="例：渋谷駅、自宅の最寄り駅"
+              className="w-full rounded-md border border-stone-300 bg-white px-3 py-3 text-base outline-none transition focus:border-moss focus:ring-2 focus:ring-leaf/30"
+            />
+            <button
+              type="button"
+              onClick={onUseCurrentLocation}
+              disabled={isGettingLocation}
+              className="rounded-md border border-moss px-4 py-3 text-sm font-bold text-moss transition hover:bg-moss hover:text-white disabled:cursor-not-allowed disabled:border-stone-300 disabled:text-stone-400 disabled:hover:bg-white"
+            >
+              {isGettingLocation ? "取得中..." : "現在地を使う"}
+            </button>
+          </div>
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
+          {locationError ? (
+            <p className="text-sm text-red-600">{locationError}</p>
+          ) : null}
+          {isGettingLocation ? (
+            <p className="text-sm text-moss">現在地を取得中...</p>
+          ) : null}
         </div>
 
         <fieldset className="space-y-3">
