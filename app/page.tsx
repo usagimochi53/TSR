@@ -13,6 +13,7 @@ import type { Candidate, WalkDistance, WalkRecord, WalkTheme } from "@/lib/types
 export default function Home() {
   const [startLocation, setStartLocation] = useState("");
   const [distance, setDistance] = useState<WalkDistance>(5);
+  const [returnToStart, setReturnToStart] = useState(false);
   const [theme, setTheme] = useState<WalkTheme>("喫茶店巡り");
   const [error, setError] = useState("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -29,8 +30,14 @@ export default function Home() {
       return;
     }
 
+    if (!Number.isFinite(distance) || distance <= 0) {
+      setError("距離は1km以上で入力してください。");
+      setCandidates([]);
+      return;
+    }
+
     setError("");
-    setCandidates(generateCandidates(startLocation, distance, theme));
+    setCandidates(generateCandidates(startLocation, distance, theme, returnToStart));
   }
 
   function handleAddRecord(record: WalkRecord) {
@@ -52,10 +59,12 @@ export default function Home() {
         <SearchForm
           startLocation={startLocation}
           distance={distance}
+          returnToStart={returnToStart}
           theme={theme}
           error={error}
           onStartLocationChange={setStartLocation}
           onDistanceChange={setDistance}
+          onReturnToStartChange={setReturnToStart}
           onThemeChange={setTheme}
           onSubmit={handleSearch}
         />

@@ -1,4 +1,4 @@
-export type WalkDistance = 5 | 10 | 15;
+export type WalkDistance = number;
 
 export type WalkTheme =
   | "喫茶店巡り"
@@ -11,7 +11,11 @@ export type Candidate = {
   title: string;
   description: string;
   recommendedDistance: WalkDistance;
+  routeDistanceLabel: string;
+  destinationKeyword: string;
+  routeWaypoints: string[];
   mapUrl: string;
+  walkingRouteUrl: string;
 };
 
 export type WalkRecord = {

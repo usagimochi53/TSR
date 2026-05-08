@@ -6,10 +6,12 @@ import type { WalkDistance, WalkTheme } from "@/lib/types";
 type SearchFormProps = {
   startLocation: string;
   distance: WalkDistance;
+  returnToStart: boolean;
   theme: WalkTheme;
   error: string;
   onStartLocationChange: (value: string) => void;
   onDistanceChange: (value: WalkDistance) => void;
+  onReturnToStartChange: (value: boolean) => void;
   onThemeChange: (value: WalkTheme) => void;
   onSubmit: () => void;
 };
@@ -25,10 +27,12 @@ const themes: WalkTheme[] = [
 export function SearchForm({
   startLocation,
   distance,
+  returnToStart,
   theme,
   error,
   onStartLocationChange,
   onDistanceChange,
+  onReturnToStartChange,
   onThemeChange,
   onSubmit,
 }: SearchFormProps) {
@@ -78,7 +82,49 @@ export function SearchForm({
               </button>
             ))}
           </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="walk-distance"
+              className="text-sm font-semibold text-stone-700"
+            >
+              歩きたい距離を入力
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                id="walk-distance"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*[.]?[0-9]*"
+                value={distance}
+                onChange={(event) =>
+                  onDistanceChange(Number(event.target.value))
+                }
+                className="w-full rounded-md border border-stone-300 bg-white px-3 py-3 text-base outline-none transition focus:border-moss focus:ring-2 focus:ring-leaf/30"
+              />
+              <span className="text-sm font-semibold text-stone-700">km</span>
+            </div>
+            <p className="text-xs leading-5 text-stone-500">
+              目的地候補は入力距離に近い距離帯から選びます。
+            </p>
+          </div>
         </fieldset>
+
+        <label className="flex items-start gap-3 rounded-md border border-stone-200 bg-stone-50 p-4">
+          <input
+            type="checkbox"
+            checked={returnToStart}
+            onChange={(event) => onReturnToStartChange(event.target.checked)}
+            className="mt-1 h-5 w-5 rounded border-stone-300 text-moss focus:ring-leaf/40"
+          />
+          <span className="space-y-1">
+            <span className="block text-sm font-semibold text-ink">
+              出発地に戻るルートにする
+            </span>
+            <span className="block text-xs leading-5 text-stone-600">
+              チェックありなら周遊、なしなら出発地から目的地までの片道ルートで開きます。
+            </span>
+          </span>
+        </label>
 
         <div className="space-y-2">
           <label htmlFor="theme" className="text-sm font-semibold text-ink">

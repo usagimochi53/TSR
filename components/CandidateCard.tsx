@@ -8,12 +8,18 @@ type CandidateCardProps = {
 };
 
 export function CandidateCard({ candidate }: CandidateCardProps) {
-  function handleOpenMap(event: MouseEvent<HTMLButtonElement>) {
+  function handleOpenSearch(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
-    // アプリ内ブラウザでは外部リンクの新規タブが開かない場合があるため、
-    // 現在のタブを直接Googleマップへ移動します。
+    // アプリ内ブラウザでも動くように、現在のタブを周辺検索URLへ移動します。
     window.location.assign(candidate.mapUrl);
+  }
+
+  function handleOpenWalkingRoute(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+
+    // 徒歩ルートボタンでは、出発地から目的地までの経路URLを開きます。
+    window.location.assign(candidate.walkingRouteUrl);
   }
 
   return (
@@ -25,16 +31,31 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
         </p>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm font-semibold text-moss">
-          推奨距離：{candidate.recommendedDistance}km
-        </p>
-        <button
-          type="button"
-          onClick={handleOpenMap}
-          className="inline-flex justify-center rounded-md bg-leaf px-4 py-2.5 text-sm font-bold text-white transition hover:bg-moss"
-        >
-          Googleマップで開く
-        </button>
+        <div className="space-y-1 text-sm font-semibold text-moss">
+          <p>希望距離：{candidate.recommendedDistance}km</p>
+          <p>{candidate.routeDistanceLabel}</p>
+          {candidate.routeWaypoints.length > 0 ? (
+            <p className="font-medium text-stone-600">
+              経由地：{candidate.routeWaypoints.join(" → ")}
+            </p>
+          ) : null}
+        </div>
+        <div className="grid gap-2 sm:min-w-56">
+          <button
+            type="button"
+            onClick={handleOpenSearch}
+            className="inline-flex justify-center rounded-md border border-leaf px-4 py-2.5 text-sm font-bold text-moss transition hover:bg-leaf hover:text-white"
+          >
+            周辺を検索する
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenWalkingRoute}
+            className="inline-flex justify-center rounded-md bg-leaf px-4 py-2.5 text-sm font-bold text-white transition hover:bg-moss"
+          >
+            Googleマップで徒歩ルートを開く
+          </button>
+        </div>
       </div>
     </article>
   );
