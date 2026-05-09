@@ -8,13 +8,23 @@ export type WalkTheme =
   | "パン屋巡り"
   | "神社・お寺巡り"
   | "川沿い・水辺巡り"
-  | "商店街巡り";
+  | "商店街巡り"
+  | "銭湯巡り"
+  | "スーパー銭湯巡り";
 
-export type AppTab = "search" | "records" | "summary";
+export type AppTab = "search" | "favorites" | "records" | "summary";
 
 export type ImportMode = "append" | "replace";
 
 export type WalkRecordFilter = {
+  keyword: string;
+  themeId: string;
+  monthKey: string;
+  minDistanceKm: string;
+  maxDistanceKm: string;
+};
+
+export type FavoriteCourseFilter = {
   keyword: string;
   themeId: string;
   monthKey: string;

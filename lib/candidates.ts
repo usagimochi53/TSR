@@ -21,6 +21,14 @@ const themeQueries: Record<WalkTheme, string[]> = {
   "神社・お寺巡り": ["神社", "お寺", "寺院", "史跡", "参道"],
   "川沿い・水辺巡り": ["川沿い", "水辺", "橋", "遊歩道", "河川敷"],
   商店街巡り: ["商店街", "市場", "路地", "昔ながらの商店街", "アーケード"],
+  銭湯巡り: ["銭湯", "公衆浴場", "昔ながらの銭湯", "サウナ 銭湯", "温泉 銭湯"],
+  スーパー銭湯巡り: [
+    "スーパー銭湯",
+    "日帰り温泉",
+    "温浴施設",
+    "岩盤浴",
+    "サウナ 温浴施設",
+  ],
 };
 
 const themeDescriptions: Record<WalkTheme, string[]> = {
@@ -79,6 +87,20 @@ const themeDescriptions: Record<WalkTheme, string[]> = {
     "小さなお店をのぞきながら、生活感のある道を歩きます。",
     "マイナーな商店街も目的地にしやすい、発見のある散歩です。",
     "買い物や食べ歩きの寄り道も楽しめる候補です。",
+  ],
+  銭湯巡り: [
+    "歩いた後に汗を流せる、散歩の締めくくりに向いた候補です。",
+    "昔ながらの銭湯を目指して、街の生活感も楽しめます。",
+    "帰りに湯冷めしにくい距離感で、気持ちよく歩ける候補です。",
+    "サウナや湯船を楽しみに、少し遠くまで足を伸ばします。",
+    "商店街や住宅街の銭湯を探しながら、ゆっくり歩けます。",
+  ],
+  スーパー銭湯巡り: [
+    "広めの温浴施設をゴールにして、達成感のある散歩にできます。",
+    "岩盤浴や休憩スペースも楽しみに、長めの道を歩けます。",
+    "歩いた後にしっかり休める、休日向きの散歩候補です。",
+    "サウナや食事処も含めて、散歩後の時間まで楽しめます。",
+    "少し遠い温浴施設を目指して、目的のあるロング散歩にできます。",
   ],
 };
 
@@ -340,6 +362,10 @@ function createGoogleMapsWalkingRouteUrl(
   )}${waypointQuery}&travelmode=walking`;
 }
 
+function createThemeDestination(basePlace: string, keyword: string) {
+  return `${basePlace} 周辺 ${keyword}`;
+}
+
 function createRouteStops(
   origin: string,
   routePlan: RoutePlan,
@@ -421,22 +447,29 @@ export function generateCandidates(
 
   return routePlans.map((routePlan, index) => {
     const keyword = themeQueries[theme][index];
-    const searchKeyword = `${routePlan.destination} ${keyword}`;
+    const themeDestination = createThemeDestination(
+      routePlan.destination,
+      keyword,
+    );
+    const searchKeyword = themeDestination;
     const routeStops = createRouteStops(
       trimmedLocation,
       routePlan,
       returnToStart,
     );
+    const themedWaypoints = routeStops.waypoints.map((waypoint) =>
+      createThemeDestination(waypoint, keyword),
+    );
     const routeDestination = returnToStart
       ? trimmedRouteOrigin
-      : routeStops.destination;
+      : themeDestination;
     const waypointText =
-      routeStops.waypoints.length > 0
-        ? `（経由：${routeStops.waypoints.join(" → ")}）`
+      themedWaypoints.length > 0
+        ? `（経由：${themedWaypoints.join(" → ")}）`
         : "";
     const title = returnToStart
-      ? `${routePlan.destination}を経由して出発地に戻る${keyword}散歩`
-      : `${routePlan.destination}まで歩いて${keyword}休憩`;
+      ? `${routePlan.destination}周辺の${keyword}を経由して出発地に戻る散歩`
+      : `${routePlan.destination}周辺の${keyword}まで歩く散歩`;
 
     return {
       id: `${theme}-${distance}-${index}`,
@@ -449,13 +482,13 @@ export function generateCandidates(
         distance,
         returnToStart,
       ),
-      destinationKeyword: routeStops.destination,
-      routeWaypoints: routeStops.waypoints,
+      destinationKeyword: themeDestination,
+      routeWaypoints: themedWaypoints,
       mapUrl: createGoogleMapsSearchUrl(searchKeyword),
       walkingRouteUrl: createGoogleMapsWalkingRouteUrl(
         trimmedRouteOrigin,
         routeDestination,
-        routeStops.waypoints,
+        themedWaypoints,
       ),
     };
   });

@@ -24,6 +24,8 @@ const allowedThemeIds = [
   "temple_shrine",
   "waterside",
   "shopping_street",
+  "sento",
+  "super_sento",
 ];
 
 function readFileAsText(file: File) {

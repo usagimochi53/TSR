@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyou-no-sanpomichi-v1";
+const CACHE_NAME = "kyou-no-sanpomichi-v2";
 const CACHE_URLS = [
   "/",
   "/manifest.json",

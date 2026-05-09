@@ -9,6 +9,7 @@ type FavoriteCourseListProps = {
   selectedFavoriteId?: string | null;
   showSelectButton?: boolean;
   onSelectFavorite?: (favorite: FavoriteCourse) => void;
+  emptyMessage?: string;
 };
 
 export function FavoriteCourseList({
@@ -19,6 +20,7 @@ export function FavoriteCourseList({
   selectedFavoriteId = null,
   showSelectButton = false,
   onSelectFavorite,
+  emptyMessage = "お気に入りコースはまだありません。散歩先候補から、あとで歩きたいコースを保存してみましょう。",
 }: FavoriteCourseListProps) {
   return (
     <section className="space-y-3 px-4">
@@ -33,7 +35,7 @@ export function FavoriteCourseList({
 
       {favorites.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-emerald-200 bg-white p-5 text-sm leading-6 text-stone-600 shadow-sm">
-          お気に入りコースはまだありません。散歩先候補から、あとで歩きたいコースを保存してみましょう。
+          {emptyMessage}
         </p>
       ) : (
         <div className="grid gap-3">

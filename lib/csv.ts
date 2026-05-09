@@ -19,6 +19,8 @@ const themeToCsvId: Record<WalkTheme, string> = {
   "神社・お寺巡り": "temple_shrine",
   "川沿い・水辺巡り": "waterside",
   商店街巡り: "shopping_street",
+  銭湯巡り: "sento",
+  スーパー銭湯巡り: "super_sento",
 };
 
 const csvIdToTheme: Record<string, WalkTheme> = {
@@ -30,6 +32,8 @@ const csvIdToTheme: Record<string, WalkTheme> = {
   temple_shrine: "神社・お寺巡り",
   waterside: "川沿い・水辺巡り",
   shopping_street: "商店街巡り",
+  sento: "銭湯巡り",
+  super_sento: "スーパー銭湯巡り",
 };
 
 function escapeCsvValue(value: string | number | undefined) {

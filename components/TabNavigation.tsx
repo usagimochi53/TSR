@@ -7,6 +7,7 @@ type TabNavigationProps = {
 
 const tabs: { id: AppTab; label: string }[] = [
   { id: "search", label: "散歩を探す" },
+  { id: "favorites", label: "お気に入り" },
   { id: "records", label: "記録する" },
   { id: "summary", label: "サマリー" },
 ];
@@ -17,7 +18,7 @@ export function TabNavigation({
 }: TabNavigationProps) {
   return (
     <nav className="px-4" aria-label="画面切り替え">
-      <div className="grid grid-cols-3 gap-2 rounded-full bg-emerald-100/70 p-1">
+      <div className="grid grid-cols-4 gap-2 rounded-full bg-emerald-100/70 p-1">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 

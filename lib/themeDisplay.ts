@@ -10,6 +10,8 @@ export const themeDisplay: Record<WalkTheme, { icon: string; label: WalkTheme }>
     "神社・お寺巡り": { icon: "⛩️", label: "神社・お寺巡り" },
     "川沿い・水辺巡り": { icon: "🌊", label: "川沿い・水辺巡り" },
     商店街巡り: { icon: "🏮", label: "商店街巡り" },
+    銭湯巡り: { icon: "♨️", label: "銭湯巡り" },
+    スーパー銭湯巡り: { icon: "🧖", label: "スーパー銭湯巡り" },
   };
 
 export const walkThemes = Object.keys(themeDisplay) as WalkTheme[];
