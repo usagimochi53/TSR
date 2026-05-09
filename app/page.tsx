@@ -5,6 +5,7 @@ import { CandidateList } from "@/components/CandidateList";
 import { Header } from "@/components/Header";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { SearchForm } from "@/components/SearchForm";
+import { TabNavigation } from "@/components/TabNavigation";
 import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
 import { WalkSummary } from "@/components/WalkSummary";
@@ -19,6 +20,7 @@ import {
 import { loadWalkRecords, saveWalkRecords } from "@/lib/storage";
 import { summarizeWalkRecords } from "@/lib/summary";
 import type {
+  AppTab,
   Candidate,
   CurrentLocation,
   WalkDistance,
@@ -40,13 +42,14 @@ export default function Home() {
   const [records, setRecords] = useState<WalkRecord[]>([]);
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [showSelectedMonthOnly, setShowSelectedMonthOnly] = useState(false);
+  const [activeTab, setActiveTab] = useState<AppTab>("search");
   const walkSummary = summarizeWalkRecords(records);
   const availableMonthKeys = getAvailableMonthKeys(records);
   const monthSummary = calculateMonthSummary(records, selectedMonthKey);
   const monthComparison = calculateCurrentMonthComparison(records);
-  const displayedRecords = showSelectedMonthOnly
-    ? records.filter((record) => getMonthKey(record.date) === selectedMonthKey)
-    : records;
+  const selectedMonthRecords = records.filter(
+    (record) => getMonthKey(record.date) === selectedMonthKey,
+  );
 
   useEffect(() => {
     setRecords(loadWalkRecords());
@@ -154,39 +157,63 @@ export default function Home() {
     <main className="min-h-screen bg-emerald-50">
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-7 pb-10">
         <Header />
-        <SearchForm
-          startLocation={startLocation}
-          distance={distance}
-          returnToStart={returnToStart}
-          theme={theme}
-          isGettingLocation={isGettingLocation}
-          error={error}
-          locationError={locationError}
-          onStartLocationChange={handleStartLocationChange}
-          onDistanceChange={setDistance}
-          onReturnToStartChange={setReturnToStart}
-          onThemeChange={setTheme}
-          onUseCurrentLocation={handleUseCurrentLocation}
-          onSubmit={handleSearch}
-        />
-        <CandidateList candidates={candidates} />
-        <WalkSummary summary={walkSummary} />
-        <MonthlySummary
-          availableMonthKeys={availableMonthKeys}
-          selectedMonthKey={selectedMonthKey}
-          summary={monthSummary}
-          comparison={monthComparison}
-          showSelectedMonthOnly={showSelectedMonthOnly}
-          onSelectedMonthChange={setSelectedMonthKey}
-          onShowSelectedMonthOnlyChange={setShowSelectedMonthOnly}
-        />
-        <div className="grid gap-7">
-          <WalkRecordForm onAddRecord={handleAddRecord} />
-          <WalkRecordList
-            records={displayedRecords}
-            onDeleteRecord={handleDeleteRecord}
-          />
-        </div>
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {activeTab === "search" ? (
+          <>
+            <SearchForm
+              startLocation={startLocation}
+              distance={distance}
+              returnToStart={returnToStart}
+              theme={theme}
+              isGettingLocation={isGettingLocation}
+              error={error}
+              locationError={locationError}
+              onStartLocationChange={handleStartLocationChange}
+              onDistanceChange={setDistance}
+              onReturnToStartChange={setReturnToStart}
+              onThemeChange={setTheme}
+              onUseCurrentLocation={handleUseCurrentLocation}
+              onSubmit={handleSearch}
+            />
+            <CandidateList candidates={candidates} />
+          </>
+        ) : null}
+
+        {activeTab === "records" ? (
+          <div className="grid gap-7">
+            <WalkRecordForm onAddRecord={handleAddRecord} />
+            <WalkRecordList
+              records={records}
+              onDeleteRecord={handleDeleteRecord}
+              showDeleteButton
+            />
+          </div>
+        ) : null}
+
+        {activeTab === "summary" ? (
+          <div className="grid gap-7">
+            <WalkSummary summary={walkSummary} />
+            <MonthlySummary
+              availableMonthKeys={availableMonthKeys}
+              selectedMonthKey={selectedMonthKey}
+              summary={monthSummary}
+              comparison={monthComparison}
+              showSelectedMonthOnly={showSelectedMonthOnly}
+              onSelectedMonthChange={setSelectedMonthKey}
+              onShowSelectedMonthOnlyChange={setShowSelectedMonthOnly}
+            />
+            {showSelectedMonthOnly ? (
+              <WalkRecordList
+                records={selectedMonthRecords}
+                onDeleteRecord={handleDeleteRecord}
+                title="選択月の履歴"
+                showDeleteButton={false}
+                emptyMessage="この月の散歩記録はまだありません。"
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </main>
   );

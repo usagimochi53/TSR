@@ -4,11 +4,17 @@ import type { WalkRecord } from "@/lib/types";
 type WalkRecordListProps = {
   records: WalkRecord[];
   onDeleteRecord: (id: string) => void;
+  title?: string;
+  showDeleteButton?: boolean;
+  emptyMessage?: string;
 };
 
 export function WalkRecordList({
   records,
   onDeleteRecord,
+  title = "保存した記録",
+  showDeleteButton = true,
+  emptyMessage = "まだ散歩記録がありません。歩いた距離やメモを残すと、ここに履歴が表示されます。",
 }: WalkRecordListProps) {
   function handleDeleteRecord(id: string) {
     if (window.confirm("この散歩記録を削除しますか？")) {
@@ -18,11 +24,11 @@ export function WalkRecordList({
 
   return (
     <section className="space-y-3 px-4 pb-10">
-      <h2 className="text-xl font-bold text-stone-900">保存した記録</h2>
+      <h2 className="text-xl font-bold text-stone-900">{title}</h2>
 
       {records.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-emerald-200 bg-white p-5 text-sm leading-6 text-stone-600 shadow-sm">
-          まだ散歩記録がありません。歩いた距離やメモを残すと、ここに履歴が表示されます。
+          {emptyMessage}
         </p>
       ) : (
         <div className="space-y-3">
@@ -51,13 +57,15 @@ export function WalkRecordList({
                       <p className="text-sm text-stone-500">メモなし</p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteRecord(record.id)}
-                    className="min-h-11 rounded-xl border border-red-200 bg-white px-4 text-sm font-bold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100"
-                  >
-                    削除
-                  </button>
+                  {showDeleteButton ? (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteRecord(record.id)}
+                      className="min-h-11 rounded-xl border border-red-200 bg-white px-4 text-sm font-bold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100"
+                    >
+                      削除
+                    </button>
+                  ) : null}
                 </div>
               </article>
             );

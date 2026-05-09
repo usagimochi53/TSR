@@ -6,6 +6,8 @@ export type WalkTheme =
   | "コンビニ巡り"
   | "スーパー巡り";
 
+export type AppTab = "search" | "records" | "summary";
+
 export type Candidate = {
   id: string;
   theme: WalkTheme;

@@ -161,7 +161,7 @@ export function WalkRecordForm({ onAddRecord }: WalkRecordFormProps) {
           type="submit"
           className="min-h-12 w-full rounded-xl bg-emerald-600 px-4 font-bold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-200"
         >
-          記録を保存
+          記録する
         </button>
       </form>
     </section>
