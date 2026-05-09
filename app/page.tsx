@@ -25,7 +25,11 @@ import {
   getMonthKey,
 } from "@/lib/monthlySummary";
 import { generateWalkRecommendation } from "@/lib/recommendation";
-import { loadWalkRecords, saveWalkRecords } from "@/lib/storage";
+import {
+  loadWalkRecords,
+  saveWalkRecords,
+  updateWalkRecord,
+} from "@/lib/storage";
 import { summarizeWalkRecords } from "@/lib/summary";
 import { walkThemes } from "@/lib/themeDisplay";
 import type {
@@ -200,6 +204,11 @@ export default function Home() {
     saveWalkRecords(nextRecords);
   }
 
+  function handleUpdateRecord(record: WalkRecord) {
+    const nextRecords = updateWalkRecord(record);
+    setRecords(nextRecords);
+  }
+
   function handleSaveMonthlyGoal(goalKm: number) {
     saveMonthlyWalkGoal(goalKm);
     setMonthlyGoalKm(goalKm);
@@ -249,7 +258,9 @@ export default function Home() {
             <WalkRecordList
               records={records}
               onDeleteRecord={handleDeleteRecord}
+              onUpdateRecord={handleUpdateRecord}
               showDeleteButton
+              showEditButton
             />
           </div>
         ) : null}
@@ -278,6 +289,7 @@ export default function Home() {
                 onDeleteRecord={handleDeleteRecord}
                 title="選択月の履歴"
                 showDeleteButton={false}
+                showEditButton={false}
                 emptyMessage="この月の散歩記録はまだありません。"
               />
             ) : null}

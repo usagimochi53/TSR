@@ -33,6 +33,7 @@ export type WalkRecord = {
   theme: WalkTheme;
   memo: string;
   createdAt: string;
+  updatedAt?: string;
 };
 
 export type ThemeSummary = {
