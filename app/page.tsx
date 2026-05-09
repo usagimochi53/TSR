@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BackupRestore } from "@/components/BackupRestore";
 import { CandidateList } from "@/components/CandidateList";
 import { FavoriteCourseList } from "@/components/FavoriteCourseList";
 import { Header } from "@/components/Header";
@@ -232,6 +233,15 @@ export default function Home() {
     setRecords(nextRecords);
   }
 
+  function handleImportRecords(nextRecords: WalkRecord[]) {
+    const sortedRecords = [...nextRecords].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    setRecords(sortedRecords);
+    saveWalkRecords(sortedRecords);
+  }
+
   function handleSaveFavorite(candidate: Candidate) {
     if (!startLocation.trim()) {
       setFavoriteMessage(
@@ -338,6 +348,14 @@ export default function Home() {
         {activeTab === "records" ? (
           <div className="grid gap-7">
             <WalkRecordForm onAddRecord={handleAddRecord} />
+            <BackupRestore
+              records={records}
+              onImportRecords={handleImportRecords}
+            />
+            <FavoriteCourseList
+              favorites={favorites}
+              onDeleteFavorite={handleDeleteFavorite}
+            />
             <WalkRecordList
               records={records}
               onDeleteRecord={handleDeleteRecord}

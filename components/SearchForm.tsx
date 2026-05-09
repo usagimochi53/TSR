@@ -143,36 +143,33 @@ export function SearchForm({
           </span>
         </label>
 
-        <fieldset className="space-y-3">
-          <legend className="text-sm font-semibold text-stone-900">
+        <div className="space-y-2">
+          <label
+            htmlFor="walk-theme"
+            className="text-sm font-semibold text-stone-900"
+          >
             テーマ
-          </legend>
-          <div className="grid gap-2 sm:grid-cols-2">
+          </label>
+          <select
+            id="walk-theme"
+            value={theme}
+            onChange={(event) => onThemeChange(event.target.value as WalkTheme)}
+            className="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-4 text-base font-semibold text-stone-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+          >
             {walkThemes.map((item) => {
               const display = themeDisplay[item];
-              const isSelected = theme === item;
 
-              // テーマはスマホでも押しやすいボタンとして並べます。
               return (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => onThemeChange(item)}
-                  className={`min-h-12 rounded-xl border px-4 text-left text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-emerald-100 ${
-                    isSelected
-                      ? "border-emerald-600 bg-emerald-600 text-white"
-                      : "border-stone-300 bg-white text-stone-700 hover:bg-emerald-50"
-                  }`}
-                >
-                  <span className="mr-2" aria-hidden="true">
-                    {display.icon}
-                  </span>
-                  {display.label}
-                </button>
+                <option key={item} value={item}>
+                  {display.icon} {display.label}
+                </option>
               );
             })}
-          </div>
-        </fieldset>
+          </select>
+          <p className="text-xs leading-5 text-stone-500">
+            テーマが増えたので、一覧から選びやすいドロップダウンにしました。
+          </p>
+        </div>
 
         <button
           type="submit"

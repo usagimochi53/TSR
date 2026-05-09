@@ -4,9 +4,15 @@ export type WalkTheme =
   | "喫茶店巡り"
   | "公園巡り"
   | "コンビニ巡り"
-  | "スーパー巡り";
+  | "スーパー巡り"
+  | "パン屋巡り"
+  | "神社・お寺巡り"
+  | "川沿い・水辺巡り"
+  | "商店街巡り";
 
 export type AppTab = "search" | "records" | "summary";
+
+export type ImportMode = "append" | "replace";
 
 export type Candidate = {
   id: string;
