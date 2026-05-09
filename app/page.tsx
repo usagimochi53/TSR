@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CandidateList } from "@/components/CandidateList";
 import { Header } from "@/components/Header";
+import { MonthlyGoal } from "@/components/MonthlyGoal";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { SearchForm } from "@/components/SearchForm";
 import { TabNavigation } from "@/components/TabNavigation";
@@ -11,6 +12,11 @@ import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
 import { WalkSummary } from "@/components/WalkSummary";
 import { generateCandidates } from "@/lib/candidates";
+import {
+  deleteMonthlyWalkGoal,
+  getMonthlyWalkGoal,
+  saveMonthlyWalkGoal,
+} from "@/lib/goal";
 import {
   calculateCurrentMonthComparison,
   calculateMonthSummary,
@@ -47,6 +53,7 @@ export default function Home() {
   const [recommendation, setRecommendation] =
     useState<WalkRecommendation | null>(null);
   const [records, setRecords] = useState<WalkRecord[]>([]);
+  const [monthlyGoalKm, setMonthlyGoalKm] = useState<number | null>(null);
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [showSelectedMonthOnly, setShowSelectedMonthOnly] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>("search");
@@ -60,6 +67,7 @@ export default function Home() {
 
   useEffect(() => {
     setRecords(loadWalkRecords());
+    setMonthlyGoalKm(getMonthlyWalkGoal());
   }, []);
 
   function handleStartLocationChange(value: string) {
@@ -192,6 +200,16 @@ export default function Home() {
     saveWalkRecords(nextRecords);
   }
 
+  function handleSaveMonthlyGoal(goalKm: number) {
+    saveMonthlyWalkGoal(goalKm);
+    setMonthlyGoalKm(goalKm);
+  }
+
+  function handleDeleteMonthlyGoal() {
+    deleteMonthlyWalkGoal();
+    setMonthlyGoalKm(null);
+  }
+
   return (
     <main className="min-h-screen bg-emerald-50">
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-7 pb-10">
@@ -238,6 +256,12 @@ export default function Home() {
 
         {activeTab === "summary" ? (
           <div className="grid gap-7">
+            <MonthlyGoal
+              goalKm={monthlyGoalKm}
+              currentMonthDistanceKm={walkSummary.currentMonthDistance}
+              onSaveGoal={handleSaveMonthlyGoal}
+              onDeleteGoal={handleDeleteMonthlyGoal}
+            />
             <WalkSummary summary={walkSummary} />
             <MonthlySummary
               availableMonthKeys={availableMonthKeys}

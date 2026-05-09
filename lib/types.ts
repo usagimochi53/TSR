@@ -72,3 +72,12 @@ export type WalkRecommendation = {
   themeIcon: string;
   message: string;
 };
+
+export type WalkGoalSummary = {
+  goalKm: number;
+  currentMonthDistanceKm: number;
+  achievementRate: number;
+  displayAchievementRate: number;
+  remainingKm: number;
+  isAchieved: boolean;
+};
