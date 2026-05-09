@@ -14,6 +14,19 @@ export type AppTab = "search" | "records" | "summary";
 
 export type ImportMode = "append" | "replace";
 
+export type WalkRecordFilter = {
+  keyword: string;
+  themeId: string;
+  monthKey: string;
+  minDistanceKm: string;
+  maxDistanceKm: string;
+};
+
+export type FilterValidationResult = {
+  isValid: boolean;
+  errorMessage: string;
+};
+
 export type Candidate = {
   id: string;
   theme: WalkTheme;

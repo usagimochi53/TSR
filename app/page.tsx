@@ -10,6 +10,7 @@ import { MonthlySummary } from "@/components/MonthlySummary";
 import { SearchForm } from "@/components/SearchForm";
 import { TabNavigation } from "@/components/TabNavigation";
 import { TodayRecommendation } from "@/components/TodayRecommendation";
+import { WalkRecordFilter } from "@/components/WalkRecordFilter";
 import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
 import { WalkSummary } from "@/components/WalkSummary";
@@ -33,6 +34,11 @@ import {
   getCurrentMonthKey,
   getMonthKey,
 } from "@/lib/monthlySummary";
+import {
+  filterWalkRecords,
+  getRecordMonthOptions,
+  validateWalkRecordFilter,
+} from "@/lib/recordFilters";
 import { generateWalkRecommendation } from "@/lib/recommendation";
 import {
   loadWalkRecords,
@@ -48,9 +54,18 @@ import type {
   FavoriteCourse,
   WalkDistance,
   WalkRecommendation,
+  WalkRecordFilter as WalkRecordFilterState,
   WalkRecord,
   WalkTheme,
 } from "@/lib/types";
+
+const initialRecordFilter: WalkRecordFilterState = {
+  keyword: "",
+  themeId: "",
+  monthKey: "",
+  minDistanceKm: "",
+  maxDistanceKm: "",
+};
 
 export default function Home() {
   const [startLocation, setStartLocation] = useState("");
@@ -72,6 +87,8 @@ export default function Home() {
   const [recommendation, setRecommendation] =
     useState<WalkRecommendation | null>(null);
   const [records, setRecords] = useState<WalkRecord[]>([]);
+  const [recordFilter, setRecordFilter] =
+    useState<WalkRecordFilterState>(initialRecordFilter);
   const [monthlyGoalKm, setMonthlyGoalKm] = useState<number | null>(null);
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [showSelectedMonthOnly, setShowSelectedMonthOnly] = useState(false);
@@ -82,6 +99,43 @@ export default function Home() {
   const monthComparison = calculateCurrentMonthComparison(records);
   const selectedMonthRecords = records.filter(
     (record) => getMonthKey(record.date) === selectedMonthKey,
+  );
+  const recordFilterValidation = validateWalkRecordFilter(recordFilter);
+  const recordMonthOptions = getRecordMonthOptions(records);
+  const filteredRecords = recordFilterValidation.isValid
+    ? filterWalkRecords(records, recordFilter, walkThemes)
+    : records;
+  const recordListEmptyMessage =
+    records.length === 0
+      ? "まだ散歩記録がありません。歩いた距離やメモを残すと、ここに履歴が表示されます。"
+      : "条件に一致する散歩記録はありません。条件を変えて検索してみましょう。";
+  const favoriteCourseList = (
+    <FavoriteCourseList
+      favorites={favorites}
+      onDeleteFavorite={handleDeleteFavorite}
+      title="お気に入りした散歩道"
+      description="保存したコースを選んで、周辺検索や徒歩ルートをすぐ開けます。"
+      selectedFavoriteId={selectedFavoriteId}
+      showSelectButton
+      onSelectFavorite={handleSelectFavorite}
+    />
+  );
+  const candidateList = (
+    <CandidateList
+      candidates={candidates}
+      favoriteIds={candidates
+        .map(
+          (candidate) =>
+            createFavoriteCourseFromCandidate(
+              candidate,
+              startLocation,
+              getRouteOrigin(),
+            ).id,
+        )
+        .filter((id) => isFavoriteCourse(id, favorites))}
+      favoriteMessage={favoriteMessage}
+      onSaveFavorite={handleSaveFavorite}
+    />
   );
 
   useEffect(() => {
@@ -242,6 +296,10 @@ export default function Home() {
     saveWalkRecords(sortedRecords);
   }
 
+  function handleResetRecordFilter() {
+    setRecordFilter(initialRecordFilter);
+  }
+
   function handleSaveFavorite(candidate: Candidate) {
     if (!startLocation.trim()) {
       setFavoriteMessage(
@@ -320,28 +378,17 @@ export default function Home() {
               onUseCurrentLocation={handleUseCurrentLocation}
               onSubmit={handleSearch}
             />
-            <FavoriteCourseList
-              favorites={favorites}
-              onDeleteFavorite={handleDeleteFavorite}
-              title="お気に入りした散歩道"
-              description="保存したコースを選んで、周辺検索や徒歩ルートをすぐ開けます。"
-              selectedFavoriteId={selectedFavoriteId}
-              showSelectButton
-              onSelectFavorite={handleSelectFavorite}
-            />
-            <CandidateList
-              candidates={candidates}
-              favoriteIds={candidates.map(
-                (candidate) =>
-                  createFavoriteCourseFromCandidate(
-                    candidate,
-                    startLocation,
-                    getRouteOrigin(),
-                  ).id,
-              ).filter((id) => isFavoriteCourse(id, favorites))}
-              favoriteMessage={favoriteMessage}
-              onSaveFavorite={handleSaveFavorite}
-            />
+            {candidates.length > 0 ? (
+              <>
+                {candidateList}
+                {favoriteCourseList}
+              </>
+            ) : (
+              <>
+                {favoriteCourseList}
+                {candidateList}
+              </>
+            )}
           </>
         ) : null}
 
@@ -356,12 +403,22 @@ export default function Home() {
               favorites={favorites}
               onDeleteFavorite={handleDeleteFavorite}
             />
+            <WalkRecordFilter
+              filter={recordFilter}
+              monthOptions={recordMonthOptions}
+              totalCount={records.length}
+              filteredCount={filteredRecords.length}
+              errorMessage={recordFilterValidation.errorMessage}
+              onFilterChange={setRecordFilter}
+              onReset={handleResetRecordFilter}
+            />
             <WalkRecordList
-              records={records}
+              records={filteredRecords}
               onDeleteRecord={handleDeleteRecord}
               onUpdateRecord={handleUpdateRecord}
               showDeleteButton
               showEditButton
+              emptyMessage={recordListEmptyMessage}
             />
           </div>
         ) : null}
