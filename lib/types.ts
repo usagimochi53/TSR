@@ -50,6 +50,28 @@ export type Candidate = {
   walkingRouteUrl: string;
 };
 
+export type PlaceCandidate = {
+  id: string;
+  name: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  primaryType?: string;
+  googleMapsUri?: string;
+};
+
+export type PlacesSearchParams = {
+  latitude: number;
+  longitude: number;
+  themeId: string;
+  distanceKm: number;
+};
+
+export type PlacesSearchResult = {
+  places: PlaceCandidate[];
+  errorMessage?: string;
+};
+
 export type CurrentLocation = {
   latitude: number;
   longitude: number;

@@ -40,6 +40,7 @@ import {
   getCurrentMonthKey,
   getMonthKey,
 } from "@/lib/monthlySummary";
+import { getGoogleMapsApiKey, isPlacesApiEnabled } from "@/lib/places";
 import {
   filterWalkRecords,
   getRecordMonthOptions,
@@ -132,6 +133,10 @@ export default function Home() {
     favorites.length === 0
       ? "お気に入りコースはまだありません。散歩先候補から、あとで歩きたいコースを保存してみましょう。"
       : "条件に一致するお気に入りコースはありません。条件を変えて検索してみましょう。";
+  const placesNotice =
+    !isPlacesApiEnabled() || !getGoogleMapsApiKey()
+      ? "Google Places APIキーが未設定のため、現在はサンプル候補を表示しています。"
+      : "";
   const filteredFavoriteCourseList = (
     <FavoriteCourseList
       favorites={filteredFavorites}
@@ -155,6 +160,7 @@ export default function Home() {
         )
         .filter((id) => isFavoriteCourse(id, favorites))}
       favoriteMessage={favoriteMessage}
+      placesNotice={placesNotice}
       onSaveFavorite={handleSaveFavorite}
     />
   );

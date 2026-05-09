@@ -5,6 +5,7 @@ type CandidateListProps = {
   candidates: Candidate[];
   favoriteIds?: string[];
   favoriteMessage?: string;
+  placesNotice?: string;
   onSaveFavorite?: (candidate: Candidate) => void;
 };
 
@@ -12,6 +13,7 @@ export function CandidateList({
   candidates,
   favoriteIds = [],
   favoriteMessage = "",
+  placesNotice = "",
   onSaveFavorite,
 }: CandidateListProps) {
   if (candidates.length === 0) {
@@ -21,6 +23,11 @@ export function CandidateList({
         {favoriteMessage ? (
           <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
             {favoriteMessage}
+          </p>
+        ) : null}
+        {placesNotice ? (
+          <p className="rounded-xl bg-lime-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+            {placesNotice}
           </p>
         ) : null}
         <p className="rounded-2xl border border-dashed border-emerald-200 bg-white p-5 text-sm leading-6 text-stone-600 shadow-sm">
@@ -36,6 +43,11 @@ export function CandidateList({
       {favoriteMessage ? (
         <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
           {favoriteMessage}
+        </p>
+      ) : null}
+      {placesNotice ? (
+        <p className="rounded-xl bg-lime-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+          {placesNotice}
         </p>
       ) : null}
       <div className="grid gap-3">
