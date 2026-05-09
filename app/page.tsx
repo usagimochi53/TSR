@@ -3,11 +3,19 @@
 import { useEffect, useState } from "react";
 import { CandidateList } from "@/components/CandidateList";
 import { Header } from "@/components/Header";
+import { MonthlySummary } from "@/components/MonthlySummary";
 import { SearchForm } from "@/components/SearchForm";
 import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
 import { WalkSummary } from "@/components/WalkSummary";
 import { generateCandidates } from "@/lib/candidates";
+import {
+  calculateCurrentMonthComparison,
+  calculateMonthSummary,
+  getAvailableMonthKeys,
+  getCurrentMonthKey,
+  getMonthKey,
+} from "@/lib/monthlySummary";
 import { loadWalkRecords, saveWalkRecords } from "@/lib/storage";
 import { summarizeWalkRecords } from "@/lib/summary";
 import type {
@@ -30,7 +38,15 @@ export default function Home() {
   const [locationError, setLocationError] = useState("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [records, setRecords] = useState<WalkRecord[]>([]);
+  const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
+  const [showSelectedMonthOnly, setShowSelectedMonthOnly] = useState(false);
   const walkSummary = summarizeWalkRecords(records);
+  const availableMonthKeys = getAvailableMonthKeys(records);
+  const monthSummary = calculateMonthSummary(records, selectedMonthKey);
+  const monthComparison = calculateCurrentMonthComparison(records);
+  const displayedRecords = showSelectedMonthOnly
+    ? records.filter((record) => getMonthKey(record.date) === selectedMonthKey)
+    : records;
 
   useEffect(() => {
     setRecords(loadWalkRecords());
@@ -155,10 +171,19 @@ export default function Home() {
         />
         <CandidateList candidates={candidates} />
         <WalkSummary summary={walkSummary} />
+        <MonthlySummary
+          availableMonthKeys={availableMonthKeys}
+          selectedMonthKey={selectedMonthKey}
+          summary={monthSummary}
+          comparison={monthComparison}
+          showSelectedMonthOnly={showSelectedMonthOnly}
+          onSelectedMonthChange={setSelectedMonthKey}
+          onShowSelectedMonthOnlyChange={setShowSelectedMonthOnly}
+        />
         <div className="grid gap-7">
           <WalkRecordForm onAddRecord={handleAddRecord} />
           <WalkRecordList
-            records={records}
+            records={displayedRecords}
             onDeleteRecord={handleDeleteRecord}
           />
         </div>

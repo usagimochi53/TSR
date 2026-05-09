@@ -47,3 +47,18 @@ export type WalkSummaryData = {
   averageDistance: number;
   themeSummaries: ThemeSummary[];
 };
+
+export type MonthSummary = {
+  monthKey: string;
+  totalDistance: number;
+  count: number;
+  averageDistance: number;
+  topTheme: WalkTheme | null;
+  themeSummaries: ThemeSummary[];
+};
+
+export type MonthComparison = {
+  message: string;
+  currentMonthDistance: number;
+  previousMonthDistance: number;
+};
