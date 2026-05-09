@@ -6,9 +6,15 @@ import type { Candidate } from "@/lib/types";
 
 type CandidateCardProps = {
   candidate: Candidate;
+  isFavorite?: boolean;
+  onSaveFavorite?: (candidate: Candidate) => void;
 };
 
-export function CandidateCard({ candidate }: CandidateCardProps) {
+export function CandidateCard({
+  candidate,
+  isFavorite = false,
+  onSaveFavorite,
+}: CandidateCardProps) {
   const display = themeDisplay[candidate.theme];
 
   function handleOpenSearch(event: MouseEvent<HTMLButtonElement>) {
@@ -71,6 +77,16 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
             徒歩ルートを開く
           </button>
         </div>
+        {onSaveFavorite ? (
+          <button
+            type="button"
+            onClick={() => onSaveFavorite(candidate)}
+            disabled={isFavorite}
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-yellow-300 bg-white px-4 text-sm font-bold text-amber-700 transition hover:bg-yellow-50 focus:outline-none focus:ring-4 focus:ring-yellow-100 disabled:cursor-not-allowed disabled:border-emerald-200 disabled:bg-emerald-50 disabled:text-emerald-700"
+          >
+            {isFavorite ? "お気に入り済み" : "お気に入りに保存"}
+          </button>
+        ) : null}
       </div>
     </article>
   );

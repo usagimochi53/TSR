@@ -82,3 +82,18 @@ export type WalkGoalSummary = {
   remainingKm: number;
   isAchieved: boolean;
 };
+
+export type FavoriteCourse = {
+  id: string;
+  title: string;
+  description: string;
+  distanceKm: number;
+  theme: WalkTheme;
+  themeLabel: string;
+  themeIcon: string;
+  mapUrl: string;
+  routeUrl?: string;
+  origin: string;
+  destinationKeyword: string;
+  createdAt: string;
+};

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CandidateList } from "@/components/CandidateList";
+import { FavoriteCourseList } from "@/components/FavoriteCourseList";
 import { Header } from "@/components/Header";
 import { MonthlyGoal } from "@/components/MonthlyGoal";
 import { MonthlySummary } from "@/components/MonthlySummary";
@@ -12,6 +13,13 @@ import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
 import { WalkSummary } from "@/components/WalkSummary";
 import { generateCandidates } from "@/lib/candidates";
+import {
+  addFavoriteCourse,
+  createFavoriteCourseFromCandidate,
+  deleteFavoriteCourse,
+  getFavoriteCourses,
+  isFavoriteCourse,
+} from "@/lib/favorites";
 import {
   deleteMonthlyWalkGoal,
   getMonthlyWalkGoal,
@@ -36,6 +44,7 @@ import type {
   AppTab,
   Candidate,
   CurrentLocation,
+  FavoriteCourse,
   WalkDistance,
   WalkRecommendation,
   WalkRecord,
@@ -54,6 +63,11 @@ export default function Home() {
   const [locationError, setLocationError] = useState("");
   const [recommendationMessage, setRecommendationMessage] = useState("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteCourse[]>([]);
+  const [favoriteMessage, setFavoriteMessage] = useState("");
+  const [selectedFavoriteId, setSelectedFavoriteId] = useState<string | null>(
+    null,
+  );
   const [recommendation, setRecommendation] =
     useState<WalkRecommendation | null>(null);
   const [records, setRecords] = useState<WalkRecord[]>([]);
@@ -72,7 +86,14 @@ export default function Home() {
   useEffect(() => {
     setRecords(loadWalkRecords());
     setMonthlyGoalKm(getMonthlyWalkGoal());
+    setFavorites(getFavoriteCourses());
   }, []);
+
+  function getRouteOrigin() {
+    return currentLocation
+      ? `${currentLocation.latitude},${currentLocation.longitude}`
+      : startLocation;
+  }
 
   function handleStartLocationChange(value: string) {
     setStartLocation(value);
@@ -146,7 +167,7 @@ export default function Home() {
 
     // 現在地取得済みなら、Googleマップ経路URLのoriginだけ緯度経度にします。
     const routeOrigin = currentLocation
-      ? `${currentLocation.latitude},${currentLocation.longitude}`
+      ? getRouteOrigin()
       : startLocation;
 
     setCandidates(
@@ -162,6 +183,7 @@ export default function Home() {
 
   function handleSearch() {
     setRecommendationMessage("");
+    setFavoriteMessage("");
     searchCandidates(distance, theme);
   }
 
@@ -177,6 +199,7 @@ export default function Home() {
 
     setDistance(recommendation.distanceKm);
     setTheme(recommendation.themeId);
+    setFavoriteMessage("");
 
     // 出発地がある場合だけ、反映後すぐに既存の候補生成処理を実行します。
     if (startLocation.trim()) {
@@ -207,6 +230,45 @@ export default function Home() {
   function handleUpdateRecord(record: WalkRecord) {
     const nextRecords = updateWalkRecord(record);
     setRecords(nextRecords);
+  }
+
+  function handleSaveFavorite(candidate: Candidate) {
+    if (!startLocation.trim()) {
+      setFavoriteMessage(
+        "出発地を入力してからお気に入りに保存してください。",
+      );
+      return;
+    }
+
+    const favorite = createFavoriteCourseFromCandidate(
+      candidate,
+      startLocation,
+      getRouteOrigin(),
+    );
+
+    if (isFavoriteCourse(favorite.id, favorites)) {
+      setFavoriteMessage(
+        "このコースはすでにお気に入りに保存されています。",
+      );
+      return;
+    }
+
+    const nextFavorites = addFavoriteCourse(favorite);
+    setFavorites(nextFavorites);
+    setFavoriteMessage("お気に入りに保存しました。");
+  }
+
+  function handleDeleteFavorite(id: string) {
+    const nextFavorites = deleteFavoriteCourse(id);
+    setFavorites(nextFavorites);
+    if (selectedFavoriteId === id) {
+      setSelectedFavoriteId(null);
+    }
+  }
+
+  function handleSelectFavorite(favorite: FavoriteCourse) {
+    // 検索タブでお気に入りを選べるようにし、地図ボタンはカード内からそのまま使えます。
+    setSelectedFavoriteId(favorite.id);
   }
 
   function handleSaveMonthlyGoal(goalKm: number) {
@@ -248,7 +310,28 @@ export default function Home() {
               onUseCurrentLocation={handleUseCurrentLocation}
               onSubmit={handleSearch}
             />
-            <CandidateList candidates={candidates} />
+            <FavoriteCourseList
+              favorites={favorites}
+              onDeleteFavorite={handleDeleteFavorite}
+              title="お気に入りした散歩道"
+              description="保存したコースを選んで、周辺検索や徒歩ルートをすぐ開けます。"
+              selectedFavoriteId={selectedFavoriteId}
+              showSelectButton
+              onSelectFavorite={handleSelectFavorite}
+            />
+            <CandidateList
+              candidates={candidates}
+              favoriteIds={candidates.map(
+                (candidate) =>
+                  createFavoriteCourseFromCandidate(
+                    candidate,
+                    startLocation,
+                    getRouteOrigin(),
+                  ).id,
+              ).filter((id) => isFavoriteCourse(id, favorites))}
+              favoriteMessage={favoriteMessage}
+              onSaveFavorite={handleSaveFavorite}
+            />
           </>
         ) : null}
 
