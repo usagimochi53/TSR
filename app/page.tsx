@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { MonthlySummary } from "@/components/MonthlySummary";
 import { SearchForm } from "@/components/SearchForm";
 import { TabNavigation } from "@/components/TabNavigation";
+import { TodayRecommendation } from "@/components/TodayRecommendation";
 import { WalkRecordForm } from "@/components/WalkRecordForm";
 import { WalkRecordList } from "@/components/WalkRecordList";
 import { WalkSummary } from "@/components/WalkSummary";
@@ -17,13 +18,16 @@ import {
   getCurrentMonthKey,
   getMonthKey,
 } from "@/lib/monthlySummary";
+import { generateWalkRecommendation } from "@/lib/recommendation";
 import { loadWalkRecords, saveWalkRecords } from "@/lib/storage";
 import { summarizeWalkRecords } from "@/lib/summary";
+import { walkThemes } from "@/lib/themeDisplay";
 import type {
   AppTab,
   Candidate,
   CurrentLocation,
   WalkDistance,
+  WalkRecommendation,
   WalkRecord,
   WalkTheme,
 } from "@/lib/types";
@@ -38,7 +42,10 @@ export default function Home() {
   const [theme, setTheme] = useState<WalkTheme>("喫茶店巡り");
   const [error, setError] = useState("");
   const [locationError, setLocationError] = useState("");
+  const [recommendationMessage, setRecommendationMessage] = useState("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [recommendation, setRecommendation] =
+    useState<WalkRecommendation | null>(null);
   const [records, setRecords] = useState<WalkRecord[]>([]);
   const [selectedMonthKey, setSelectedMonthKey] = useState(getCurrentMonthKey());
   const [showSelectedMonthOnly, setShowSelectedMonthOnly] = useState(false);
@@ -109,14 +116,14 @@ export default function Home() {
     );
   }
 
-  function handleSearch() {
+  function searchCandidates(nextDistance: WalkDistance, nextTheme: WalkTheme) {
     if (!startLocation.trim()) {
       setError("出発地を入力してください。");
       setCandidates([]);
       return;
     }
 
-    if (!Number.isFinite(distance) || distance <= 0) {
+    if (!Number.isFinite(nextDistance) || nextDistance <= 0) {
       setError("距離は1km以上で入力してください。");
       setCandidates([]);
       return;
@@ -133,11 +140,43 @@ export default function Home() {
     setCandidates(
       generateCandidates(
         startLocation,
-        distance,
-        theme,
+        nextDistance,
+        nextTheme,
         returnToStart,
         routeOrigin,
       ),
+    );
+  }
+
+  function handleSearch() {
+    setRecommendationMessage("");
+    searchCandidates(distance, theme);
+  }
+
+  function handleGenerateRecommendation() {
+    setRecommendation(generateWalkRecommendation(walkThemes));
+    setRecommendationMessage("");
+  }
+
+  function handleApplyRecommendation() {
+    if (!recommendation) {
+      return;
+    }
+
+    setDistance(recommendation.distanceKm);
+    setTheme(recommendation.themeId);
+
+    // 出発地がある場合だけ、反映後すぐに既存の候補生成処理を実行します。
+    if (startLocation.trim()) {
+      setRecommendationMessage("");
+      searchCandidates(recommendation.distanceKm, recommendation.themeId);
+      return;
+    }
+
+    setCandidates([]);
+    setError("");
+    setRecommendationMessage(
+      "出発地を入力すると、この条件で散歩先を探せます。",
     );
   }
 
@@ -161,6 +200,12 @@ export default function Home() {
 
         {activeTab === "search" ? (
           <>
+            <TodayRecommendation
+              recommendation={recommendation}
+              message={recommendationMessage}
+              onGenerate={handleGenerateRecommendation}
+              onApply={handleApplyRecommendation}
+            />
             <SearchForm
               startLocation={startLocation}
               distance={distance}

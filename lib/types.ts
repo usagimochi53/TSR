@@ -64,3 +64,11 @@ export type MonthComparison = {
   currentMonthDistance: number;
   previousMonthDistance: number;
 };
+
+export type WalkRecommendation = {
+  distanceKm: number;
+  themeId: WalkTheme;
+  themeLabel: string;
+  themeIcon: string;
+  message: string;
+};
